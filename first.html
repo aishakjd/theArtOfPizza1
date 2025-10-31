@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art of Pizza - Functional Layout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            /* Colors based on the design */
+            --primary-color: #A34825; /* Dark brown/maroon */
+            --secondary-color: #E29864; /* Light orange/tan background */
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+            --background-light: #F7F5F0;
+            --card-background: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--background-light);
+            line-height: 1.6;
+        }
+        
+        main {
+            padding-bottom: 50px;
+        }
+
+        /* Utility Class for Hiding Pages */
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+
+        /* --- Header/Navigation --- */
+        .header {
+            background-color: var(--secondary-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer; /* Make logo clickable */
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            margin-right: 8px;
+        }
+        
+        .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: 2px solid var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav ul li {
+            margin-left: 25px;
+        }
+
+        .nav ul li a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 700;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav ul li a.active {
+            color: var(--text-dark);
+            text-decoration: underline;
+        }
+        
+        /* --- Hero Section (Home Page) --- */
+        #home-page .hero {
+            background-color: var(--background-light);
+            padding: 20px 5%;
+        }
+
+        .hero-content {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .hero-text {
+            color: var(--text-light);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .hero-text .profile-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #D4A373; 
+            border: 2px solid var(--text-light);
+        }
+        
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            margin-top: 50px;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .hero-image {
+            background-image: url('https://images.unsplash.com/photo-1574126154517-d1e0d89ef734?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* --- Search Bar --- */
+        .search-container {
+            padding: 20px 5%;
+            text-align: center;
+        }
+        
+        .search-bar {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            border: 2px solid #ccc;
+            border-radius: 30px;
+            padding: 10px 20px;
+            background-color: var(--card-background);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .search-bar i {
+            color: #888;
+            margin-right: 10px;
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+
+        /* --- Recipe Grid (Shared Styles) --- */
+        .recipes-section {
+            padding: 40px 5%;
+            background-color: var(--background-light);
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .recipe-card {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        #recipes-grid-page .recipe-card {
+            background-color: var(--secondary-color);
+        }
+        
+        #home-page .recipes-section {
+            background-color: var(--background-light);
+        }
+        #home-page .recipe-card {
+            background-color: var(--card-background);
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .recipe-image-wrapper {
+            width: 100%;
+            padding-top: 100%; 
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .recipe-card-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--card-background);
+        }
+
+        .recipe-card h4 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        
+        /* --- Recipe Detail Page (Top Right Design) --- */
+        #recipe-detail-page {
+            background-color: var(--background-light);
+        }
+        
+        .detail-header {
+            background-color: var(--secondary-color);
+            padding: 40px 5%;
+        }
+        .detail-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .recipe-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        .recipe-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .recipe-image-detail {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 3px solid var(--card-background);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .ingredients-instructions {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            flex-grow: 1;
+        }
+        
+        .ingredients-instructions h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        
+        .ingredients-instructions p, .ingredients-instructions ul, .ingredients-instructions ol {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .instructions-save {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .save-button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .save-button:hover {
+            background-color: #7a381e;
+        }
+        .save-button:active {
+            transform: scale(0.98);
+        }
+
+        .save-button.saved {
+            background-color: green; /* Indicate saved state */
+        }
+        
+        .comments-section {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comment-card {
+            background-color: var(--card-background);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .comment-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        
+        .comment-user {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        
+        .comment-text {
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        /* --- Profile/Saved Page (Bottom Right Design) --- */
+        #profile-page .content-wrapper {
+            background-color: var(--secondary-color);
+            padding: 40px 5%;
+            display: flex;
+            gap: 40px;
+        }
+        
+        .profile-card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            width: 250px;
+            height: fit-content;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 5px solid var(--secondary-color);
+        }
+        
+        .profile-card h3 {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        
+        .edit-button {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        
+        #profile-page .saved-recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            flex-grow: 1;
+        }
+        
+        #profile-page .saved-recipes-grid .recipe-card {
+            background-color: var(--card-background);
+            border: 1px solid #eee;
+            box-shadow: none;
+            padding: 10px;
+        }
+        
+        #profile-page .saved-recipes-grid .recipe-card-image {
+            border: 2px solid var(--background-light);
+        }
+        
+        #profile-page .saved-recipes-grid h4 {
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container" id="header-logo-container">
+            </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="#" data-page="home-page" onclick="showPage('home-page')">Home</a></li>
+                <li><a href="#" data-page="recipes-grid-page" onclick="showPage('recipes-grid-page')">Recipes</a></li>
+                <li><a href="#">Videos</a></li>
+                <li><a href="#" data-page="profile-page" onclick="showPage('profile-page')">Savings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-content active" id="home-page">
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <div class="profile-icon"></div>
+                        <p>Home</p>
+                        <h1>ART OF PIZZA</h1>
+                        <p>Many delicious recipes</p>
+                    </div>
+                    <div class="hero-image"></div>
+                </div>
+            </section>
+            
+            <section class="search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="home-search-input" placeholder="Search" oninput="handleSearch('home-page-grid', this.value)">
+                </div>
+            </section>
+
+            <section class="recipes-section">
+                <div class="recipe-grid" id="home-page-grid">
+                    </div>
+            </section>
+        </div>
+
+        <div class="page-content" id="recipe-detail-page">
+            <div class="detail-header">
+                <p>Recipes</p>
+                <h2 id="detail-recipe-title">Loaded Veggie & Sausage Pizza</h2>
+            </div>
+            
+            <div class="recipe-main">
+                <div class="recipe-left">
+                    <div class="recipe-info">
+                         <img src="https://images.unsplash.com/photo-1565299624942-4c28f691079d?auto=format&fit=crop&q=80&w=300&h=300" alt="Loaded Veggie & Sausage Pizza" class="recipe-image-detail">
+                        <div class="ingredients-instructions">
+                            <div style="display: flex; gap: 40px;">
+                                <div>
+                                    <h3>Ingredients:</h3>
+                                    <ul id="detail-ingredients">
+                                        <li>Sliced mushroom pepperoni</li>
+                                        <li>Green peppers</li>
+                                        <li>Black olives</li>
+                                        <li>Italian sausage</li>
+                                        <li>Store-bought dough</li>
+                                        <li>$1 \frac{1}{2}$ cups shredded mozzarella cheese</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3>Preparation:</h3>
+                                    <ol id="detail-preparation">
+                                        <li>Pre-warm oven, sweet sugar, and salt to set ${375^{\circ} \mathrm{F}}$</li>
+                                        <li>Add flour, salt, oil - knead to a dough and let it sit for 20 min.</li>
+                                        <li>Make sauce with tomato, garlic, herbs, salt, and pepper.</li>
+                                        <li>Roll the dough, spread the sauce, and cheese and add toppings.</li>
+                                        <li>Bake for $12 \text{min} / {15^{\circ} \mathrm{F}}$ or until golden.</li>
+                                        <li>Slice and enjoy! :)</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="instructions-save">
+                                <button class="save-button" onclick="toggleSaveRecipe(this)">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-right">
+                    <div class="comments-section">
+                        <h3>Comments</h3>
+                        <div class="comment-card">
+                            <div class="comment-avatar" style="background-image: url('https://i.pravatar.cc/300?img=1'); background-size: cover;"></div>
+                            <div>
+                                <span class="comment-user">samuelhan</span>
+                                <span class="comment-text">it's so amazing</span>
+                            </div>
+                        </div>
+                        <div class="comment-card">
+                            <div class="comment-avatar" style="background-image: url('https://i.pravatar.cc/300?img=2'); background-size: cover;"></div>
+                            <div>
+                                <span class="comment-user">ashleighC</span>
+                                <span class="comment-text">delicious</span>
+                            </div>
+                        </div>
+                        <div class="comment-card">
+                            <div class="comment-avatar" style="background-image: url('https://i.pravatar.cc/300?img=3'); background-size: cover;"></div>
+                            <div>
+                                <span class="comment-user">jenna</span>
+                                <span class="comment-text">yummy</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px; color: var(--primary-color);">Other Recipes</h3>
+                    <div class="recipe-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page-content" id="recipes-grid-page">
+            <section class="recipes-section" style="background-color: var(--secondary-color); padding-top: 20px;">
+                <p style="color: var(--primary-color); padding: 0 5%; font-weight: 700;">Recipes</p>
+                <div class="recipe-grid" id="recipes-grid-page-grid" style="max-width: 1000px; margin: 20px auto;">
+                     </div>
+            </section>
+        </div>
+
+        <div class="page-content" id="profile-page">
+            <div class="content-wrapper">
+                <div class="profile-card">
+                    <img src="https://i.pravatar.cc/300?img=4" alt="User Profile" class="profile-pic">
+                    <h3>aishahajd</h3>
+                    <button class="edit-button">Edit</button>
+                </div>
+                
+                <div class="saved-recipes-grid" id="saved-recipes-grid">
+                    <h3 style="grid-column: 1 / -1; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">Saved Recipes</h3>
+                    <p style="grid-column: 1 / -1; color: #888; margin-top: 15px;" id="no-saved-msg">No recipes saved yet.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. DATA (Simulating a database) ---
+        const allRecipes = [
+            { id: 1, title: 'Fig & Prosciutto Pizza', img: 'https://images.unsplash.com/photo-1594007654729-407edc19255e?auto=format&fit=crop&q=80&w=300&h=300', tags: ['fig', 'prosciutto', 'sweet', 'savory'] },
+            { id: 2, title: 'Tandoori Chicken Pizza', img: 'https://images.unsplash.com/photo-1594007654729-407edc19255e?auto=format&fit=crop&q=80&w=300&h=300', tags: ['chicken', 'spicy', 'indian', 'tandoori'] },
+            { id: 3, title: 'Truffle Mushroom Pizza', img: 'https://images.unsplash.com/photo-1594007654729-407edc19255e?auto=format&fit=crop&q=80&w=300&h=300', tags: ['truffle', 'mushroom', 'vegetarian', 'gourmet'] },
+            { id: 4, title: 'Kebab Pizza', img: 'https://images.unsplash.com/photo-1594007654729-407edc19255e?auto=format&fit=crop&q=80&w=300&h=300', tags: ['kebab', 'meat', 'spicy', 'mediterranean'] },
+            { id: 5, title: 'Loaded Veggie & Sausage Pizza', img: 'https://images.unsplash.com/photo-1565299624942-4c28f691079d?auto=format&fit=crop&q=80&w=300&h=300', tags: ['sausage', 'veggie', 'classic'] }
+        ];
+
+        let savedRecipes = []; 
+        let currentRecipeId = null; 
+
+        // --- 2. RECIPE RENDERING FUNCTIONS ---
+
+        // Function to create an individual recipe card HTML
+        function createRecipeCard(recipe, style = 'home') {
+            const cardClass = style === 'full' ? 'recipe-card' : 'recipe-card';
+            const imgBorder = style === 'full' ? '5px solid var(--card-background)' : '2px solid var(--background-light)';
+            
+            return `
+                <div class="${cardClass}" onclick="loadRecipeDetail(${recipe.id})">
+                    <div class="recipe-image-wrapper">
+                         <img src="${recipe.img}" alt="${recipe.title}" class="recipe-card-image" style="border: ${imgBorder};">
+                    </div>
+                    <h4>${recipe.title}</h4>
+                </div>
+            `;
+        }
+        
+        // Function to render all cards in a specified grid
+        function renderRecipes(recipes, containerId, style = 'home') {
+            const container = document.getElementById(containerId);
+            if (!container) return; 
+
+            container.innerHTML = recipes.map(recipe => createRecipeCard(recipe, style)).join('');
+            
+            // Show/hide "No recipes saved" message
+            if(containerId === 'saved-recipes-grid') {
+                const msg = document.getElementById('no-saved-msg');
+                if (recipes.length === 0) {
+                     if(!msg) {
+                        container.innerHTML += '<p style="grid-column: 1 / -1; color: #888; margin-top: 15px;" id="no-saved-msg">No recipes saved yet.</p>';
+                     }
+                } else if(msg) {
+                    msg.remove(); 
+                }
+            }
+        }
+        
+        // --- 3. CORE FUNCTIONALITY ---
+
+        // LIVE SEARCH FILTERING (Applied to Home & Recipes Grid)
+        function handleSearch(containerId, query) {
+            const normalizedQuery = query.toLowerCase().trim();
+            const filteredRecipes = allRecipes.filter(recipe => {
+                const titleMatch = recipe.title.toLowerCase().includes(normalizedQuery);
+                const tagMatch = recipe.tags.some(tag => tag.includes(normalizedQuery));
+                return titleMatch || tagMatch;
+            });
+            
+            // Determine card style based on container
+            const style = containerId === 'recipes-grid-page-grid' ? 'full' : 'home';
+            renderRecipes(filteredRecipes, containerId, style);
+        }
+
+        // TOGGLE SAVE RECIPE (For Recipe Detail Page)
+        function toggleSaveRecipe(button) {
+            if (!currentRecipeId) return;
+
+            const recipeIndex = savedRecipes.findIndex(r => r.id === currentRecipeId);
+
+            if (recipeIndex === -1) {
+                // Not saved -> Save it
+                const recipeToSave = allRecipes.find(r => r.id === currentRecipeId);
+                savedRecipes.push(recipeToSave);
+                button.classList.add('saved');
+                button.textContent = 'Saved';
+                alert(`${recipeToSave.title} added to Savings!`);
+            } else {
+                // Saved -> Unsave it
+                const title = savedRecipes[recipeIndex].title;
+                savedRecipes.splice(recipeIndex, 1);
+                button.classList.remove('saved');
+                button.textContent = 'Save';
+                alert(`${title} removed from Savings.`);
+            }
+            
+            // Re-render the savings page to reflect the change if the user navigates there
+            renderSavedRecipes();
+        }
+
+        // LOAD RECIPE DETAIL PAGE (Clicking a card)
+        function loadRecipeDetail(id) {
+            currentRecipeId = id;
+            const recipe = allRecipes.find(r => r.id === id);
+            
+            // This is placeholder content - in a real app, you would load full data here.
+            document.getElementById('detail-recipe-title').textContent = recipe.title;
+            // The image, ingredients, and preparation remain static for simplicity but could be updated here too.
+            
+            // Update the save button state
+            const saveButton = document.querySelector('#recipe-detail-page .save-button');
+            const isSaved = savedRecipes.some(r => r.id === id);
+            
+            if (isSaved) {
+                saveButton.classList.add('saved');
+                saveButton.textContent = 'Saved';
+            } else {
+                saveButton.classList.remove('saved');
+                saveButton.textContent = 'Save';
+            }
+            
+            showPage('recipe-detail-page');
+        }
+        
+        // RENDER SAVED RECIPES (For Profile/Savings Page)
+        function renderSavedRecipes() {
+            renderRecipes(savedRecipes, 'saved-recipes-grid', 'saved');
+        }
+
+
+        // --- 4. NAVIGATION AND INITIALIZATION ---
+
+        const headerLogoContainer = document.getElementById('header-logo-container');
+
+        function updateHeader(pageId) {
+            headerLogoContainer.innerHTML = '';
+            let element;
+            
+            if (pageId === 'recipe-detail-page' || pageId === 'profile-page') {
+                element = document.createElement('div');
+                element.className = 'avatar-placeholder';
+                element.innerHTML = '<i class="fas fa-user"></i>'; 
+            } else {
+                element = document.createElement('a');
+                element.href = "#";
+                element.className = 'logo';
+                element.innerHTML = '<i class="fas fa-pizza-slice"></i> Art of pizza';
+                element.onclick = () => showPage('home-page');
+            }
+            headerLogoContainer.appendChild(element);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Special rendering for specific pages
+            if (pageId === 'recipes-grid-page') {
+                renderRecipes(allRecipes, 'recipes-grid-page-grid', 'full');
+            } else if (pageId === 'profile-page') {
+                renderSavedRecipes();
+            } else if (pageId === 'home-page') {
+                 // Clear the search bar when returning home
+                document.getElementById('home-search-input').value = '';
+                renderRecipes(allRecipes, 'home-page-grid', 'home');
+            }
+            
+            // Update active navigation link
+            document.querySelectorAll('.nav ul li a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            updateHeader(pageId);
+        }
+        
+        // Initial setup: Render the cards and show the home page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pre-render the cards into the home grid
+            renderRecipes(allRecipes, 'home-page-grid', 'home');
+            showPage('home-page'); 
+        });
+
+    </script>
+</body>
+</html>
