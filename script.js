@@ -1,4 +1,3 @@
-// // --- 1. DATA (Simulating a database) ---
 const allRecipes = [];
 async function fetchRecipesFromAPI() {
   try {
@@ -12,20 +11,17 @@ async function fetchRecipesFromAPI() {
       title: recipe.title,
       img: recipe.image_url,
       publisher: recipe.publisher,
-      tags: recipe.title.toLowerCase().split(" "), // ← простой вариант
-    })); // <- теперь можно использовать
+      tags: recipe.title.toLowerCase().split(" "), 
+    }));
   } catch (err) {
     console.error("Error fetching recipes:", err);
-    return []; // возвращаем пустой массив, если не удалось
+    return [];
   }
 }
 
 let savedRecipes = [];
 let currentRecipeId = null;
 
-// --- 2. RECIPE RENDERING FUNCTIONS ---
-
-// Function to create an individual recipe card HTML
 function createRecipeCard(recipe, style = "home") {
   let imgBorder =
     style === "full"
@@ -34,12 +30,8 @@ function createRecipeCard(recipe, style = "home") {
   let cardClass = "recipe-card";
 
   if (style === "saved") {
-    cardClass += " saved-card"; // <— мини-режим
+    cardClass += " saved-card"; 
   }
-
-  // NOTE: publisher is missing in savedRecipes, so we use a fallback if needed
-  const publisherText =
-    recipe.publisher || (style === "saved" ? "Saved" : "Recipe");
 
   return `
     <div class="${cardClass}" onclick="loadRecipeDetail('${recipe.id}')">
@@ -47,12 +39,11 @@ function createRecipeCard(recipe, style = "home") {
         <img src="${recipe.img}" alt="${recipe.title}" class="recipe-card-image" style="border: ${imgBorder};">
       </div>
       <h4>${recipe.title}</h4>
-      <p>${publisherText}</p>
+      <p>${recipe.publisher}</p>
     </div>
   `;
 }
 
-// Function to render all cards in a specified grid
 function renderRecipes(recipes, containerId, style = "home") {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -61,7 +52,6 @@ function renderRecipes(recipes, containerId, style = "home") {
     .map((recipe) => createRecipeCard(recipe, style))
     .join("");
 
-  // Show/hide "No recipes saved" message
   if (containerId === "saved-recipes-grid") {
     const msg = document.getElementById("no-saved-msg");
     if (recipes.length === 0) {
@@ -75,50 +65,65 @@ function renderRecipes(recipes, containerId, style = "home") {
   }
 }
 
+// script.js
+
 async function loginUser(email, password) {
   try {
-    // ✅ ИСПРАВЛЕНО: Правильный URL для логина
     const res = await fetch("http://localhost:5000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      credentials: "include", 
       body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
     if (data.success) {
-      // ✅ Упрощенная логика: сервер устанавливает сессию, мы просто обновляем профиль
-      await loadUserProfile();
-      alert("Logged in!");
+      const currentEmail = await getCurrentUserEmail();
+      if (currentEmail) {
+        localStorage.setItem("userEmail", currentEmail); 
+        await loadUserProfile(); 
+        alert("Logged in!");
+      } else {
+        alert("Login failed: no session found.");
+      }
     } else {
       alert(data.message);
     }
   } catch (err) {
     console.error("Login failed:", err);
-    alert("Login failed due to network or server error.");
   }
 }
 
-// УДАЛЕНА ФУНКЦИЯ getCurrentUser
+async function getCurrentUser() {
+  try {
+    const email = localStorage.getItem("userEmail"); 
+    if (!email) return null;
+
+    const res = await fetch(`http://localhost:5000/profile/${email}`);
+    if (!res.ok) throw new Error("Failed to fetch user");
+
+    const data = await res.json();
+    return data.user; 
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
 
 async function getCurrentUserEmail() {
   try {
     const res = await fetch("http://localhost:5000/current-user", {
-      credentials: "include",
+      credentials: "include", 
     });
     if (!res.ok) throw new Error("Failed to fetch current user");
     const data = await res.json();
-    console.log("CURRENT USER DATA:", data);
-    return data.email; // null если не залогинен
+    return data.email;
   } catch (err) {
     console.error("Error fetching current user email:", err);
     return null;
   }
 }
 
-// --- 3. CORE FUNCTIONALITY ---
-
-// LIVE SEARCH FILTERING (Applied to Home & Recipes Grid)
 function handleSearch(containerId, query) {
   const normalizedQuery = query.toLowerCase().trim();
   const filteredRecipes = allRecipes.filter((recipe) => {
@@ -127,20 +132,22 @@ function handleSearch(containerId, query) {
     return titleMatch || tagMatch;
   });
 
-  // Determine card style based on container
   const style = containerId === "recipes-grid-page-grid" ? "full" : "home";
   renderRecipes(filteredRecipes, containerId, style);
 }
 
-// TOGGLE SAVE RECIPE (For Recipe Detail Page)
 async function toggleSaveRecipe(button) {
+  const userEmail = await getCurrentUserEmail();
+  if (!userEmail) {
+    alert("Please log in to save recipes!");
+    return;
+  }
   if (!currentRecipeId) return;
 
   const recipe = allRecipes.find((r) => r.id === currentRecipeId);
   const isSaved = savedRecipes.some((r) => r.id === currentRecipeId);
 
   if (!isSaved) {
-    // --- SAVE TO SERVER ---
     const res = await fetch("http://localhost:5000/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -153,94 +160,61 @@ async function toggleSaveRecipe(button) {
         },
       }),
     });
-
-    if (res.status === 401) {
-      alert("Please log in to save recipes! (Session expired or not found)");
-      return;
-    }
-
     const data = await res.json();
     if (data.success) {
       savedRecipes.push(recipe);
       button.classList.add("saved");
       button.textContent = "Saved";
     } else {
-      alert(data.message || "Ошибка при сохранении: сервер отклонил запрос.");
+      alert("Ошибка при сохранении");
     }
   } else {
-    // --- DELETE FROM SERVER ---
     const res = await fetch("http://localhost:5000/saved", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ recipeId: currentRecipeId }),
     });
-
-    if (res.status === 401) {
-      alert("Please log in to save recipes! (Session expired or not found)");
-      return;
-    }
-
     const data = await res.json();
     if (data.success) {
       savedRecipes = savedRecipes.filter((r) => r.id !== currentRecipeId);
       button.classList.remove("saved");
       button.textContent = "Save";
     } else {
-      alert(data.message || "Ошибка при удалении: сервер отклонил запрос.");
+      alert("Ошибка при удалении");
     }
   }
 
   renderSavedRecipes();
 }
 
-//LOADING SAVINGS
 async function loadSavedFromServer() {
-  // ✅ ИСПРАВЛЕНО: Запрашиваем без email, полагаясь на сессию
-  const res = await fetch(`http://localhost:5000/saved`, {
-    credentials: "include",
-  });
+  const userEmail = await getCurrentUserEmail();
+  if (!userEmail) return;
 
-  if (res.status === 401) {
-    savedRecipes = [];
-    return;
-  }
-
-  if (!res.ok) {
-    console.error("Failed to fetch saved recipes.");
-    savedRecipes = [];
-    return;
-  }
-
+  const res = await fetch(`http://localhost:5000/saved/${userEmail}`);
   const data = await res.json();
 
-  if (Array.isArray(data)) {
-    savedRecipes = data.map((recipe) => ({
-      id: recipe.id,
-      title: recipe.title,
-      img: recipe.image, // Сервер возвращает поле image
-    }));
-  } else {
-    savedRecipes = [];
-  }
+  savedRecipes = data.map((recipe) => ({
+    id: recipe.id,
+    title: recipe.title,
+    img: recipe.image,
+  }));
 }
 
 function renderSavingsPage() {
   const container = document.getElementById("saved-recipes-grid");
-  // Получаем email из localStorage, который был установлен loadUserProfile
   const userEmail = localStorage.getItem("userEmail");
 
-  container.innerHTML = "";
+  container.innerHTML = ""; 
 
-  // 1 — пользователь не вошёл
   if (!userEmail) {
     container.innerHTML = `
-      <p class="empty-message">Войдите в аккаунт, чтобы увидеть сохранённые рецепты 🍕</p>
+      <p class="empty-message">Log in to the account for seeing the recipes 🍕</p>
     `;
     return;
   }
 
-  // 2 — пользователь вошёл, но нет рецептов
   if (savedRecipes.length === 0) {
     container.innerHTML = `
       <p class="empty-message">You don't have any saved recipes 👀</p>
@@ -248,42 +222,33 @@ function renderSavingsPage() {
     return;
   }
 
-  // 3 — есть рецепты → рендерим
   renderRecipes(savedRecipes, "saved-recipes-grid", "saved");
 }
 
-// LOAD RECIPE DETAIL PAGE (Clicking a card)
 function loadRecipeDetail(id) {
   currentRecipeId = id;
   const recipe = allRecipes.find((r) => r.id === id);
 
-  // Update the detail page image
   document.getElementById("detail-recipe-title").textContent = recipe.title;
   document.getElementById("detail-recipe-img").src = recipe.img;
 
-  // Update the save button state
   const saveButton = document.querySelector("#recipe-detail-page .save-button");
   const isSaved = savedRecipes.some((r) => r.id === id);
 
-  if (saveButton) {
-    if (isSaved) {
-      saveButton.classList.add("saved");
-      saveButton.textContent = "Saved";
-    } else {
-      saveButton.classList.remove("saved");
-      saveButton.textContent = "Save";
-    }
+  if (isSaved) {
+    saveButton.classList.add("saved");
+    saveButton.textContent = "Saved";
+  } else {
+    saveButton.classList.remove("saved");
+    saveButton.textContent = "Save";
   }
 
   showPage("recipe-detail-page");
 }
 
-// RENDER SAVED RECIPES (For Profile/Savings Page)
 function renderSavedRecipes() {
   renderRecipes(savedRecipes, "saved-recipes-grid", "saved");
 }
-
-// --- 4. NAVIGATION AND INITIALIZATION ---
 
 const headerLogoContainer = document.getElementById("header-logo-container");
 
@@ -303,23 +268,15 @@ function showPage(pageId) {
   });
   document.getElementById(pageId).classList.add("active");
 
-  // Special rendering for specific pages
   if (pageId === "recipes-grid-page") {
     renderRecipes(allRecipes, "recipes-grid-page-grid", "full");
   } else if (pageId === "profile-page") {
-    // ВАЖНО: При переходе на профиль, нужно обновить данные и рендерить
-    loadUserProfile().then(() => {
-      loadSavedFromServer().then(() => {
-        renderSavingsPage();
-      });
-    });
+    renderSavingsPage();
   } else if (pageId === "home-page") {
-    // Clear the search bar when returning home
     document.getElementById("home-search-input").value = "";
     renderRecipes(allRecipes, "home-page-grid", "home");
   }
 
-  // Update active navigation link
   document.querySelectorAll(".nav ul li a").forEach((link) => {
     link.classList.remove("active");
     if (link.getAttribute("data-page") === pageId) {
@@ -330,15 +287,11 @@ function showPage(pageId) {
   updateHeader(pageId);
 }
 
-//EDIT PROFILE MODAL
-const editButton = document.querySelector(".edit-button");
-if (editButton) {
-  editButton.onclick = () => {
-    const fullName = localStorage.getItem("userFullName") || "";
-    document.getElementById("edit-fullname").value = fullName;
-    document.getElementById("edit-modal").style.display = "flex";
-  };
-}
+document.querySelector(".edit-button").onclick = () => {
+  const fullName = localStorage.getItem("userFullName") || "";
+  document.getElementById("edit-fullname").value = fullName;
+  document.getElementById("edit-modal").style.display = "flex";
+};
 
 function closeEditModal() {
   document.getElementById("edit-modal").style.display = "none";
@@ -366,153 +319,90 @@ async function saveProfileChanges() {
     return;
   }
 
-  // Обновляем UI и данные
   await loadUserProfile();
   closeEditModal();
 }
 
-// обновляем локально(уже не локалли)
 async function loadUserProfile() {
-  try {
-    // ✅ ИСПРАВЛЕНО: Правильный URL бэкенда для профиля
-    const res = await fetch("http://localhost:5000/profile", {
-      method: "GET",
-      credentials: "include",
-    });
-
-    // 401 означает, что сессия недействительна. Сбрасываем все.
-    if (res.status === 401) {
-      throw new Error("Unauthorized or session expired");
-    }
-
-    const data = await res.json();
-    const welcomeEl = document.getElementById("welcome-message");
-
-    if (data.success) {
-      window.isLoggedIn = true;
-
-      // ✅ ИСПРАВЛЕНО: Сохраняем полученные данные в localStorage
-      localStorage.setItem("userEmail", data.email);
-      localStorage.setItem("userFullName", data.fullName);
-
-      // Формируем полный URL для аватара
-      const avatarUrl = data.avatar.startsWith("http")
-        ? data.avatar
-        : `http://localhost:5000${
-            data.avatar.startsWith("/") ? data.avatar : "/" + data.avatar
-          }`;
-
-      localStorage.setItem("userAvatar", avatarUrl);
-
-      // Обновляем элементы UI
-      const profileNameEl = document.getElementById("profile-name");
-      const profileEmailEl = document.getElementById("profile-email");
-
-      if (profileNameEl) profileNameEl.textContent = data.fullName;
-      if (profileEmailEl) profileEmailEl.textContent = data.email;
-
-      if (welcomeEl) welcomeEl.textContent = `Welcome, ${data.email}! 🍕`;
-
-      updateProfileCard(); // Обновляем карточку
-    } else {
-      throw new Error(
-        "Profile fetch failed: " + (data.message || "Unknown error")
-      );
-    }
-  } catch (err) {
-    console.warn("loadUserProfile failed:", err.message);
-
-    // Сброс данных при ошибке/неавторизованности
-    window.isLoggedIn = false;
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userFullName");
-    localStorage.removeItem("userAvatar");
-
-    const welcomeEl = document.getElementById("welcome-message");
-    if (welcomeEl) welcomeEl.textContent = `Welcome, Guest! 🍕`;
-
-    // Сброс UI
-    const profileNameEl = document.getElementById("profile-name");
-    const profileEmailEl = document.getElementById("profile-email");
-    if (profileNameEl) profileNameEl.textContent = "Guest";
-    if (profileEmailEl) profileEmailEl.textContent = "Please log in";
-
-    updateProfileCard();
+  const userEmail = await getCurrentUserEmail();
+  const profileName = document.querySelector(".profile-card h3");
+  const profilePic = document.querySelector(".profile-pic");
+  if (!userEmail) {
+    profileName.textContent = "User";
+    profilePic.src = "avatar.jpeg";
+    return;
   }
+
+  const user = await getCurrentUser();
+  profileName.textContent = user.fullName || "User";
+  profilePic.src = user.avatar
+    ? `http://localhost:5000${user.avatar}`
+    : "avatar.jpeg";
 }
 
 function updateProfileCard() {
-  // Используем дефолтный аватар, если нет сохраненного в localStorage
-  const defaultAvatar = "avatar.jpeg";
+  const name = localStorage.getItem("userFullName") || "User";
+  const avatar = localStorage.getItem("userAvatar") || "avatar.jpeg";
 
-  const name = localStorage.getItem("userFullName") || "Guest";
-  const avatar = localStorage.getItem("userAvatar") || defaultAvatar;
-
-  const nameEl = document.querySelector(".profile-card h3");
-  const picEl = document.querySelector(".profile-pic");
-
-  if (nameEl) nameEl.textContent = name;
-
-  // Убедимся, что путь к аватару корректен
-  if (picEl) {
-    // Если это полный URL (сохраненный в loadUserProfile) или дефолтный файл
-    picEl.src = avatar;
-  }
+  document.querySelector(".profile-card h3").textContent = name;
+  document.querySelector(".profile-pic").src = avatar;
 }
 
-//LOGOUT
+document.addEventListener("DOMContentLoaded", () => {
+  updateProfileCard();
+});
+
 const logoutLink = document.getElementById("logout-link");
-if (logoutLink) {
-  logoutLink.onclick = async () => {
-    await fetch("http://localhost:5000/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+logoutLink.onclick = async () => {
+  await fetch("http://localhost:5000/logout", {
+    method: "POST",
+    credentials: "include",
+  }); 
+  await loadUserProfile(); 
 
-    // Сброс всех данных и UI
-    savedRecipes = [];
-    await loadUserProfile();
+  showPage("home-page");
 
-    // Возвращаемся на главную
-    showPage("home-page");
-  };
-}
+  updateProfileCard();
+};
 
-function transitionToPage(newPageId) {
-  const currentPage = document.querySelector(".page-content.active");
-  const newPage = document.getElementById(newPageId);
-
-  if (currentPage) {
-    currentPage.classList.remove("active");
-  }
-
-  setTimeout(() => {
-    if (newPage) {
-      newPage.classList.add("active");
-      window.scrollTo(0, 0);
-    }
-  }, 500);
-}
-
-// Initial setup: Render the cards and show the home page
 document.addEventListener("DOMContentLoaded", async () => {
-  // 1. Устанавливаем статус авторизации и обновляем UI
   await loadUserProfile();
-
-  // 2. Загружаем сохраненные рецепты
+  updateProfileCard();
+  const welcomeEl = document.getElementById("welcome-message");
+  const userEmail = localStorage.getItem("userEmail");
   await loadSavedFromServer();
 
-  // 3. Загружаем рецепты с API и рендерим
+  if (userEmail && welcomeEl) {
+    welcomeEl.textContent = `Welcome, ${userEmail}! 🍕`;
+  }
+
   try {
     const recipes = await fetchRecipesFromAPI();
     if (recipes && recipes.length) {
-      allRecipes.splice(0, allRecipes.length, ...recipes); // обновляем массив
-      renderRecipes(allRecipes, "home-page-grid", "home"); // рендерим
+      allRecipes.splice(0, allRecipes.length, ...recipes); 
+      renderRecipes(allRecipes, "home-page-grid", "home"); 
     }
   } catch (err) {
     console.error("Failed to load API recipes:", err);
-    renderRecipes(allRecipes, "home-page-grid", "home"); // fallback
+    renderRecipes(allRecipes, "home-page-grid", "home"); 
   }
 
   showPage("home-page");
 });
+
+function transitionToPage(newPageId) {
+  const currentPage = document.querySelector('.page-content.active');
+  const newPage = document.getElementById(newPageId);
+  
+  if (currentPage) {
+      currentPage.classList.remove('active');
+  }
+
+  setTimeout(() => {
+      if (newPage) {
+          newPage.classList.add('active');
+          window.scrollTo(0, 0); 
+      }
+  }, 500); 
+}
+
