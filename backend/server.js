@@ -37,12 +37,10 @@ const authMiddleware = async (req, res, next) => {
   const userEmail = req.header("X-User-Email");
 
   if (!userEmail) {
-    return res
-      .status(401)
-      .json({
-        success: false,
-        message: "Unauthorized: Missing user identifier",
-      });
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: Missing user identifier",
+    });
   }
 
   // Находим пользователя по email
