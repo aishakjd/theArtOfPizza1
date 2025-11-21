@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+    <title>Register</title>
+    <link rel="stylesheet" href="login_register.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="logo-container" id="header-logo-container"></div>
+    <div class="container">
+      <form id="registerForm">
+        <h1 id="logo"><i class="fas fa-pizza-slice"></i> Art of pizza</h1>
+        <h2>Register</h2>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter your full name" />
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="Enter your email" />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm password"
+          />
+        </div>
+
+        <p class="error" id="registerError"></p>
+        <button type="submit" class="btn">Register</button>
+
+        <p class="switch">
+          Already have an account? <a href="login.html">Login</a>
+        </p>
+      </form>
+    </div>
+
+    <script src="login_register.js"></script>
+  </body>
+</html>

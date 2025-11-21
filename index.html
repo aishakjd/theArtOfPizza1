@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Art of Pizza - Functional Layout</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo-container" id="header-logo-container"></div>
+      <nav class="nav">
+        <ul>
+          <li><a href="login.html">LOG IN</a></li>
+          <li><a href="#" id="logout-link">Logout</a></li>
+          <li>
+            <a href="#" data-page="home-page" onclick="showPage('home-page')"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              data-page="recipes-grid-page"
+              onclick="showPage('recipes-grid-page')"
+              >Recipes</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              data-page="profile-page"
+              onclick="showPage('profile-page')"
+              >Savings</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="page-content active" id="home-page">
+        <section class="hero" style="background: transparent">
+          <div class="hero-content">
+            <div class="hero-text">
+              <p>Home</p>
+              <h1>ART OF PIZZA</h1>
+              <p>Many delicious recipes</p>
+              <p
+                id="welcome-message"
+                style="
+                  font-weight: 600;
+                  color: var(--secondary-color);
+                  margin-top: 10px;
+                "
+              ></p>
+            </div>
+            <div class="hero-image"></div>
+          </div>
+        </section>
+
+        <section class="search-container">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="home-search-input"
+              placeholder="Search"
+              oninput="handleSearch('home-page-grid', this.value)"
+            />
+          </div>
+        </section>
+
+        <section class="recipes-section" style="background: transparent">
+          <div class="recipe-grid" id="home-page-grid"></div>
+        </section>
+      </div>
+
+      <div class="page-content" id="recipe-detail-page">
+        <div class="detail-header">
+          <p>Recipes</p>
+          <h2 id="detail-recipe-title">Loaded Veggie & Sausage Pizza</h2>
+        </div>
+        <div class="recipe-main">
+          <div class="recipe-left">
+            <div class="recipe-info">
+              <img
+                src="https://images.unsplash.com/photo-1565299624942-4c28f691079d?auto=format&fit=crop&q=80&w=300&h=300"
+                alt="Loaded Veggie & Sausage Pizza"
+                class="recipe-image-detail"
+                id="detail-recipe-img"
+              />
+              <div class="ingredients-instructions">
+                <div style="display: flex; gap: 40px">
+                  <div>
+                    <h3>Ingredients:</h3>
+                    <ul id="detail-ingredients">
+                      <li>Sliced mushroom pepperoni</li>
+                      <li>Green peppers</li>
+                      <li>Black olives</li>
+                      <li>Italian sausage</li>
+                      <li>Store-bought dough</li>
+                      <li>$1 \frac{1}{2}$ cups shredded mozzarella cheese</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3>Preparation:</h3>
+                    <ol id="detail-preparation">
+                      <li>
+                        Pre-warm oven, sweet sugar, and salt to set
+                        ${375^{\circ} \mathrm{F}}$
+                      </li>
+                      <li>
+                        Add flour, salt, oil - knead to a dough and let it sit
+                        for 20 min.
+                      </li>
+                      <li>
+                        Make sauce with tomato, garlic, herbs, salt, and pepper.
+                      </li>
+                      <li>
+                        Roll the dough, spread the sauce, and cheese and add
+                        toppings.
+                      </li>
+                      <li>
+                        Bake for $12 \text{min} / {15^{\circ} \mathrm{F}}$ or
+                        until golden.
+                      </li>
+                      <li>Slice and enjoy! :)</li>
+                    </ol>
+                  </div>
+                </div>
+                <div class="instructions-save">
+                  <button class="save-button" onclick="toggleSaveRecipe(this)">
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="recipe-right">
+            <div class="comments-section">
+              <h3>Comments</h3>
+              <div class="comment-card">
+                <div
+                  class="comment-avatar"
+                  style="
+                    background-image: url('https://i.pravatar.cc/300?img=1');
+                    background-size: cover;
+                  "
+                ></div>
+                <div>
+                  <span class="comment-user">samuelhan</span>
+                  <span class="comment-text">it's so amazing</span>
+                </div>
+              </div>
+              <div class="comment-card">
+                <div
+                  class="comment-avatar"
+                  style="
+                    background-image: url('https://i.pravatar.cc/300?img=2');
+                    background-size: cover;
+                  "
+                ></div>
+                <div>
+                  <span class="comment-user">ashleighC</span>
+                  <span class="comment-text">delicious</span>
+                </div>
+              </div>
+              <div class="comment-card">
+                <div
+                  class="comment-avatar"
+                  style="
+                    background-image: url('https://i.pravatar.cc/300?img=3');
+                    background-size: cover;
+                  "
+                ></div>
+                <div>
+                  <span class="comment-user">jenna</span>
+                  <span class="comment-text">yummy</span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="recipe-grid"
+              style="
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-top: 10px;
+              "
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-content" id="recipes-grid-page">
+        <section
+          class="recipes-section"
+          style="background: transparent; padding-top: 20px"
+        >
+          <p
+            style="color: var(--primary-color); padding: 0 5%; font-weight: 700"
+          >
+            Recipes
+          </p>
+          <div
+            class="recipe-grid"
+            id="recipes-grid-page-grid"
+            style="max-width: 1000px; margin: 20px auto"
+          ></div>
+        </section>
+      </div>
+
+      <div class="page-content" id="profile-page">
+        <div class="content-wrapper" style="background: transparent">
+          <div class="profile-card">
+            <img src="avatar.jpeg" alt="User Profile" class="profile-pic" />
+            <h3>aishakjd</h3>
+            <button class="edit-button">Edit</button>
+          </div>
+          <div class="edit-modal" id="edit-modal">
+            <div class="edit-modal-content">
+              <h3>Edit profile</h3>
+
+              <label>Full name:</label>
+              <input type="text" id="edit-fullname" />
+
+              <label>Avatar:</label>
+              <input type="file" id="edit-avatar" accept="image/*" />
+
+              <button onclick="saveProfileChanges()" class="save-profile-btn">
+                Save
+              </button>
+              <button onclick="closeEditModal()" class="cancel-profile-btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <div class="saved-recipes-grid" id="saved-recipes-grid">
+            <h3
+              style="
+                grid-column: 1 / -1;
+                color: var(--primary-color);
+                border-bottom: 2px solid var(--primary-color);
+                padding-bottom: 10px;
+              "
+            >
+              Saved Recipes
+            </h3>
+            <p
+              style="grid-column: 1 / -1; color: #888; margin-top: 15px"
+              id="no-saved-msg"
+            >
+              No recipes saved yet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
