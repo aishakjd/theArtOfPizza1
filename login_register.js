@@ -48,7 +48,7 @@ async function registerUser(e) {
 
   // отправка на backend
   try {
-    const res = await fetch("http://localhost:5000/register", {
+    const res = await fetch("http://localhost:5001/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fullName, email, password }),
@@ -87,7 +87,7 @@ async function loginUser(e) {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/login", {
+    const res = await fetch("http://localhost:5001/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
