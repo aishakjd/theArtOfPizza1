@@ -6,7 +6,7 @@ const cors = require("cors");
 const multer = require("multer");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // --- MIDDLEWARES ---
 app.use(express.json({ limit: "10mb" }));
@@ -16,16 +16,14 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 // Разрешаем фронтенду отправлять кастомные заголовки (X-User-Email)
 app.use(
   cors({
-    // Разрешаем все варианты портов для локальной разработки
     origin: [
       "http://127.0.0.1:5501",
       "http://localhost:5501",
       "http://localhost:5500",
       "http://127.0.0.1:5500",
     ],
-    credentials: true,
-    // !!! КРИТИЧНО: Разрешаем кастомный заголовок для авторизации
     allowedHeaders: ["Content-Type", "Authorization", "X-User-Email"],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
   })
 );
 
