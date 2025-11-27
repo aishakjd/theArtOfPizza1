@@ -70,7 +70,25 @@ const UserSchema = new mongoose.Schema({
   fullName: String,
   avatar: String,
   savedRecipes: [{ id: String, title: String, image: String }],
+  comments: [
+    {
+      recipeId: String,
+      text: String,
+      user: String,
+      avatar: String,
+      date: String,
+    },
+  ],
 });
+const CommentSchema = new mongoose.Schema({
+  recipeId: String,
+  user: String,
+  avatar: String,
+  text: String,
+  date: { type: Date, default: Date.now }
+});
+
+const Comment = mongoose.model("Comment", CommentSchema);
 
 const User = mongoose.model("User", UserSchema);
 
@@ -227,5 +245,35 @@ app.delete("/saved", authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, message: "Delete failed" });
   }
 });
+
+
+app.post("/comment", authMiddleware, async (req, res) => {
+  const { recipeId, text } = req.body;
+
+  if (!text || !text.trim()) {
+    return res.json({ success: false, message: "Comment cannot be empty" });
+  }
+
+  const user = await User.findById(req.userId);
+
+  const newComment = await Comment.create({
+    recipeId,
+    text,
+    user: user.fullName || user.email,
+    avatar: user.avatar || "/avatar.jpeg"
+  });
+
+  res.json({ success: true, comment: newComment });
+});
+
+app.get("/comments/:recipeId", async (req, res) => {
+  const recipeId = req.params.recipeId;
+
+  const comments = await Comment.find({ recipeId }).sort({ date: -1 });
+
+  res.json({ success: true, comments });
+});
+
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
