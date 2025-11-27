@@ -150,45 +150,13 @@
           <div class="recipe-right">
             <div class="comments-section">
               <h3>Comments</h3>
-              <div class="comment-card">
-                <div
-                  class="comment-avatar"
-                  style="
-                    background-image: url('https://i.pravatar.cc/300?img=1');
-                    background-size: cover;
-                  "
-                ></div>
-                <div>
-                  <span class="comment-user">samuelhan</span>
-                  <span class="comment-text">it's so amazing</span>
-                </div>
-              </div>
-              <div class="comment-card">
-                <div
-                  class="comment-avatar"
-                  style="
-                    background-image: url('https://i.pravatar.cc/300?img=2');
-                    background-size: cover;
-                  "
-                ></div>
-                <div>
-                  <span class="comment-user">ashleighC</span>
-                  <span class="comment-text">delicious</span>
-                </div>
-              </div>
-              <div class="comment-card">
-                <div
-                  class="comment-avatar"
-                  style="
-                    background-image: url('https://i.pravatar.cc/300?img=3');
-                    background-size: cover;
-                  "
-                ></div>
-                <div>
-                  <span class="comment-user">jenna</span>
-                  <span class="comment-text">yummy</span>
-                </div>
-              </div>
+            
+              <div id="comments-list"></div>
+            
+              <form id="comment-form" class="comment-form">
+                <input type="text" id="comment-input" placeholder="Write a comment..." required />
+                <button type="submit">Post</button>
+              </form>
             </div>
             <div
               class="recipe-grid"
@@ -221,6 +189,18 @@
       </div>
 
       <div class="page-content" id="profile-page">
+
+        <div class="savings-search-container">
+          <div class="savings-search-bar">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text"
+              id="savings-search-input"
+              placeholder="Search saved recipes..."
+              oninput="handleSavingsSearch(this.value)"
+            />
+          </div>
+        </div>
         <div class="content-wrapper" style="background: transparent">
           <div class="profile-card">
             <img src="avatar.jpeg" alt="User Profile" class="profile-pic" />
@@ -230,6 +210,9 @@
           <div class="edit-modal" id="edit-modal">
             <div class="edit-modal-content">
               <h3>Edit profile</h3>
+              <div class="edit-avatar-preview">
+                <img id="edit-avatar-img" src="" alt="Avatar preview">
+              </div>
 
               <label>Full name:</label>
               <input type="text" id="edit-fullname" />
@@ -246,8 +229,8 @@
             </div>
           </div>
 
-          <div class="saved-recipes-grid" id="saved-recipes-grid">
-            <h3
+          <div id="saved-recipes-grid" class="recipe-grid"></div>
+            <!-- <h3
               style="
                 grid-column: 1 / -1;
                 color: var(--primary-color);
@@ -256,13 +239,13 @@
               "
             >
               Saved Recipes
-            </h3>
-            <p
+            </h3> -->
+            <!-- <p
               style="grid-column: 1 / -1; color: #888; margin-top: 15px"
               id="no-saved-msg"
             >
               No recipes saved yet.
-            </p>
+            </p> -->
           </div>
         </div>
       </div>
