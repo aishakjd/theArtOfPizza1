@@ -176,6 +176,30 @@ function handleSearch(containerId, query) {
   renderRecipes(filteredRecipes, containerId, style);
 }
 
+function handleSavingsSearch(query) {
+  const normalizedQuery = query.toLowerCase().trim();
+
+  const filtered = savedRecipes.filter(recipe =>
+    recipe.title.toLowerCase().includes(normalizedQuery)
+  );
+
+  renderRecipes(filtered, "saved-recipes-grid", "full");
+
+  const msg = document.getElementById("no-saved-msg");
+
+  if (filtered.length === 0) {
+    if (!msg) {
+      document.getElementById("saved-recipes-grid").innerHTML += `
+        <p id="no-saved-msg" style="grid-column: 1 / -1; text-align: center; color: #888; margin-top: 20px;">
+          No recipes match your search 👀
+        </p>
+      `;
+    }
+  } else if (msg) {
+    msg.remove();
+  }
+}
+
 // TOGGLE SAVE RECIPE (For Recipe Detail Page)
 async function toggleSaveRecipe(button) {
   if (!currentRecipeId) return;
@@ -263,6 +287,8 @@ async function loadSavedFromServer() {
 }
 
 function renderSavingsPage() {
+
+  document.getElementById("savings-search-input").value = "";
   const container = document.getElementById("saved-recipes-grid");
   // Получаем email из localStorage, который был установлен loadUserProfile
   const userEmail = localStorage.getItem("userEmail");
@@ -286,13 +312,14 @@ function renderSavingsPage() {
   }
 
   // 3 — есть рецепты → рендерим
-  renderRecipes(savedRecipes, "saved-recipes-grid", "saved");
+  renderRecipes(savedRecipes, "saved-recipes-grid", "full");
 }
 
 // LOAD RECIPE DETAIL PAGE (Clicking a card)
 function loadRecipeDetail(id) {
   currentRecipeId = id;
   const recipe = allRecipes.find((r) => r.id === id);
+  loadComments(id);
 
   // Update the detail page image
   document.getElementById("detail-recipe-title").textContent = recipe.title;
@@ -317,7 +344,7 @@ function loadRecipeDetail(id) {
 
 // RENDER SAVED RECIPES (For Profile/Savings Page)
 function renderSavedRecipes() {
-  renderRecipes(savedRecipes, "saved-recipes-grid", "saved");
+  renderRecipes(savedRecipes, "saved-recipes-grid", "full");
 }
 
 // --- 4. NAVIGATION AND INITIALIZATION ---
@@ -373,6 +400,13 @@ const editButton = document.querySelector(".edit-button");
 if (editButton) {
   editButton.onclick = () => {
     const fullName = localStorage.getItem("userFullName") || "";
+    document.getElementById("edit-avatar-img").src = localStorage.getItem("userAvatar") || "avatar.jpeg";
+    document.getElementById("edit-avatar").onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById("edit-avatar-img").src = URL.createObjectURL(file);
+      }
+    };
     document.getElementById("edit-fullname").value = fullName;
     document.getElementById("edit-modal").style.display = "flex";
   };
@@ -539,4 +573,65 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   showPage("home-page");
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("comment-form");
+  if (form) {
+    form.addEventListener("submit", postComment);
+  }
+});
+
+async function postComment(e) {
+  e.preventDefault();
+
+  const text = document.getElementById("comment-input").value.trim();
+  if (!text) return;
+
+  const { res, data } = await authFetch("http://localhost:5001/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ recipeId: currentRecipeId, text })
+  });
+
+  if (data && data.success) {
+    document.getElementById("comment-input").value = "";
+    loadComments(currentRecipeId);
+  }
+}
+async function loadComments(recipeId) {
+  const res = await fetch(`http://localhost:5001/comments/${recipeId}`);
+  const data = await res.json();
+
+  const list = document.getElementById("comments-list");
+  list.innerHTML = "";
+
+  data.comments.forEach((c) => {
+    list.innerHTML += `
+      <div class="comment-item">
+        <img src="http://localhost:5001${c.avatar}" />
+        <div>
+          <div class="comment-user">${c.user}</div>
+          <div class="comment-text">${c.text}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+document.getElementById("comment-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const input = document.getElementById("comment-input");
+  const text = input.value;
+
+  const { res, data } = await authFetch("http://localhost:5001/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ recipeId: currentRecipeId, text }),
+  });
+
+  if (data.success) {
+    input.value = "";
+    loadComments(currentRecipeId);
+  }
 });
